@@ -1,18 +1,20 @@
 package com.elconfidencial.bubbleshowcase
 
 import android.app.Activity
+import android.content.Context
 import android.graphics.drawable.Drawable
-import android.support.v4.content.ContextCompat
 import android.view.View
 import android.view.ViewTreeObserver
+import androidx.core.content.ContextCompat
 import java.lang.ref.WeakReference
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Created by jcampos on 04/09/2018.
  */
-class BubbleShowCaseBuilder{
+class BubbleShowCaseBuilder {
 
+    internal var mContext: Context? = null
     internal var mActivity: WeakReference<Activity>? = null
     internal var mImage: Drawable? = null
     internal var mTitle: String? = null
@@ -32,15 +34,18 @@ class BubbleShowCaseBuilder{
     internal var mTargetView: WeakReference<View>? = null
     internal var mBubbleShowCaseListener: BubbleShowCaseListener? = null
     internal var mSequenceShowCaseListener: SequenceShowCaseListener? = null
+    internal var mBackgroundDuration = 700
 
     private var onGlobalLayoutListenerTargetView: ViewTreeObserver.OnGlobalLayoutListener? = null
 
     /**
      * Builder constructor. It needs an instance of the current activity to convert it to a weak reference in order to avoid memory leaks
      */
-    constructor(activity: Activity){
-        mActivity = WeakReference(activity)
+    constructor(context: Context) {
+        mContext = context
+        mActivity = WeakReference(context as Activity)
     }
+
 
     /**
      * Title of the BubbleShowCase. This text is bolded in the view.
@@ -72,7 +77,7 @@ class BubbleShowCaseBuilder{
      *  - If this param is not passed, the BubbleShowCase will not have main image
      */
     fun imageResourceId(resId: Int): BubbleShowCaseBuilder {
-        mImage = ContextCompat.getDrawable(mActivity!!.get(), resId)
+        mImage = ContextCompat.getDrawable(mContext!!, resId)
         return this
     }
 
@@ -90,7 +95,7 @@ class BubbleShowCaseBuilder{
      *  - If this param is not defined, a default close icon is displayed
      */
     fun closeActionImageResourceId(resId: Int): BubbleShowCaseBuilder {
-        mCloseAction = ContextCompat.getDrawable(mActivity!!.get(), resId)
+        mCloseAction = ContextCompat.getDrawable(mContext!!, resId)
         return this
     }
 
@@ -109,7 +114,7 @@ class BubbleShowCaseBuilder{
      *  - #3F51B5 color will be set if this param is not defined
      */
     fun backgroundColorResourceId(colorResId: Int): BubbleShowCaseBuilder {
-        mBackgroundColor = ContextCompat.getColor(mActivity!!.get(), colorResId)
+        mBackgroundColor = ContextCompat.getColor(mContext!!, colorResId)
         return this
     }
 
@@ -127,7 +132,7 @@ class BubbleShowCaseBuilder{
      *  - White color will be set if this param is not defined
      */
     fun textColorResourceId(colorResId: Int): BubbleShowCaseBuilder {
-        mTextColor = ContextCompat.getColor(mActivity!!.get(), colorResId)
+        mTextColor = ContextCompat.getColor(mContext!!, colorResId)
         return this
     }
 
@@ -171,7 +176,7 @@ class BubbleShowCaseBuilder{
      * If this variable is true, when user clicks on the target, the showcase will not be dismissed
      *  Default value -> false
      */
-    fun disableTargetClick(isDisabled: Boolean): BubbleShowCaseBuilder{
+    fun disableTargetClick(isDisabled: Boolean): BubbleShowCaseBuilder {
         mDisableTargetClick = isDisabled
         return this
     }
@@ -180,7 +185,7 @@ class BubbleShowCaseBuilder{
      * If this variable is true, close action button will be gone
      *  Default value -> false
      */
-    fun disableCloseAction(isDisabled: Boolean): BubbleShowCaseBuilder{
+    fun disableCloseAction(isDisabled: Boolean): BubbleShowCaseBuilder {
         mDisableCloseAction = isDisabled
         return this
     }
@@ -227,6 +232,11 @@ class BubbleShowCaseBuilder{
         return this
     }
 
+    fun backgroundDuration(backgroundDuration: Int): BubbleShowCaseBuilder {
+        mBackgroundDuration = backgroundDuration
+        return this
+    }
+
     /**
      * Add a sequence listener in order to know when a BubbleShowCase has been dismissed to show another one
      */
@@ -235,12 +245,12 @@ class BubbleShowCaseBuilder{
         return this
     }
 
-    internal fun isFirstOfSequence(isFirst: Boolean): BubbleShowCaseBuilder{
+    internal fun isFirstOfSequence(isFirst: Boolean): BubbleShowCaseBuilder {
         mIsFirstOfSequence = isFirst
         return this
     }
 
-    internal fun isLastOfSequence(isLast: Boolean): BubbleShowCaseBuilder{
+    internal fun isLastOfSequence(isLast: Boolean): BubbleShowCaseBuilder {
         mIsLastOfSequence = isLast
         return this
     }
@@ -249,9 +259,9 @@ class BubbleShowCaseBuilder{
      * Build the BubbleShowCase object from the builder one
      */
     private fun build(): BubbleShowCase {
-        if(mIsFirstOfSequence ==null)
+        if (mIsFirstOfSequence == null)
             mIsFirstOfSequence = true
-        if(mIsLastOfSequence ==null)
+        if (mIsLastOfSequence == null)
             mIsLastOfSequence = true
 
         return BubbleShowCase(this)
@@ -260,11 +270,10 @@ class BubbleShowCaseBuilder{
     /**
      * Show the BubbleShowCase using the params added previously
      */
-    fun show(): BubbleShowCase{
+    fun show(): BubbleShowCase {
         val bubbleShowCase = build()
-        if (mTargetView != null) {
-            val targetView = mTargetView!!.get()
-            if (targetView!!.height == 0 || targetView.width == 0) {
+        mTargetView?.get()?.let { targetView ->
+            if (targetView.height == 0 || targetView.width == 0) {
                 //If the view is not already painted, we wait for it waiting for view changes using OnGlobalLayoutListener
                 onGlobalLayoutListenerTargetView = ViewTreeObserver.OnGlobalLayoutListener {
                     bubbleShowCase.show()
@@ -274,9 +283,9 @@ class BubbleShowCaseBuilder{
             } else {
                 bubbleShowCase.show()
             }
-        } else {
+        } ?: {
             bubbleShowCase.show()
-        }
+        }()
         return bubbleShowCase
     }
 

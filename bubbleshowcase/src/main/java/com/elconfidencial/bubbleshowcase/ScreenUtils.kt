@@ -4,13 +4,10 @@ import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Point
-import android.graphics.Rect
 import android.util.DisplayMetrics
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.view.Window.ID_ANDROID_CONTENT
-
 
 
 /**
@@ -46,12 +43,12 @@ object ScreenUtils {
         return locationTarget[1]
     }
 
-    fun getVerticalScreenOffset(activity: Activity): Int{
+    fun getVerticalScreenOffset(activity: Activity): Int {
         val viewRoot = getViewRoot(activity)
         return getScreenHeight(activity) - viewRoot.height
     }
 
-    fun getHorizontalScreenOffset(activity: Activity): Int{
+    fun getHorizontalScreenOffset(activity: Activity): Int {
         val viewRoot = getViewRoot(activity)
         return getScreenWidth(activity) - viewRoot.width
     }
@@ -80,15 +77,15 @@ object ScreenUtils {
         return Math.round(dp * (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT))
     }
 
-    fun isViewLocatedAtHalfTopOfTheScreen(activity: Activity, targetView: View): Boolean{
+    fun isViewLocatedAtHalfTopOfTheScreen(activity: Activity, targetView: View): Boolean {
         val screenHeight = getScreenHeight(activity)
         val positionTargetAxisY = getAxisYpositionOfViewOnScreen(targetView)
-        return screenHeight/2 > positionTargetAxisY
+        return screenHeight / 2 > positionTargetAxisY
     }
 
-    fun isViewLocatedAtHalfLeftOfTheScreen(activity: Activity, targetView: View): Boolean{
+    fun isViewLocatedAtHalfLeftOfTheScreen(activity: Activity, targetView: View): Boolean {
         val screenWidth = getScreenWidth(activity)
         val positionTargetAxisX = getAxisXpositionOfViewOnScreen(targetView)
-        return screenWidth/2 > positionTargetAxisX
+        return screenWidth / 2 > positionTargetAxisX
     }
 }
